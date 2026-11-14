@@ -2,13 +2,13 @@
 // @name         解锁复制(选中/右键/Ctrl+C)
 // @name:en      Enable Copy & Right-Click
 // @namespace    local.demo.copy-unlock
-// @version      1.7.0
+// @version      1.7.1
 // @description  解除网页「禁止复制 / 禁止粘贴」限制:恢复文字选中、右键菜单;复制被拦时自动补写剪贴板;粘贴被拦时把内容当作手动录入写进输入框(文字、截图/图片都支持);「自动输入面板」可把任意内容写进网页输入框(含超星学习通答题框等 UEditor/iframe 编辑器)。开关按网站分别记忆。
 // @description:en  Re-enable text selection, context menu and copy/cut on pages that block them.
 // @author       demo
 // @license      MIT
-// @updateURL    https://raw.githubusercontent.com/dundunduo6799/enable-copy-tampermonkey/main/enable-copy.user.js
-// @downloadURL  https://raw.githubusercontent.com/dundunduo6799/enable-copy-tampermonkey/main/enable-copy.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/dundunduo6799/enable-copy-tampermonkey@main/enable-copy.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/dundunduo6799/enable-copy-tampermonkey@main/enable-copy.user.js
 // @match        *://*/*
 // @match        file:///*
 // @match        about:blank*

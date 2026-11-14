@@ -18,11 +18,13 @@
 
 ## 📦 安装
 
-**方式一:GitHub 一键安装**(推荐)
+**方式一:一键安装**(国内推荐,jsDelivr CDN 直连可用)
 
 1. 浏览器装好 [篡改猴 Tampermonkey](https://www.tampermonkey.net/)
-2. 打开:<https://raw.githubusercontent.com/dundunduo6799/enable-copy-tampermonkey/main/enable-copy.user.js>
+2. 打开:<https://cdn.jsdelivr.net/gh/dundunduo6799/enable-copy-tampermonkey@main/enable-copy.user.js>
 3. 弹出的安装页点「安装」;以后有更新会自动提示
+
+> 备用(GitHub raw,国内可能超时):<https://raw.githubusercontent.com/dundunduo6799/enable-copy-tampermonkey/main/enable-copy.user.js>
 
 **方式二:Greasy Fork 脚本库**(发布后)
 
