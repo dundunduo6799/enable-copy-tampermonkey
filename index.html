@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🔒 禁止复制演示网站</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    color: #0f172a;
+    background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 320px);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 34px 20px 56px; }
+  h1 { font-size: 26px; margin: 0 0 10px; }
+  .sub { margin: 0; color: #64748b; font-size: 15px; line-height: 1.8; }
+
+  .status {
+    margin-top: 20px; padding: 14px 18px; border-radius: 12px;
+    font-size: 15px; font-weight: 600; border: 1px solid transparent;
+    transition: all .25s ease;
+  }
+  .status.locked   { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+  .status.unlocked { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+
+  .card {
+    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
+    padding:22px 24px; margin-top:22px;
+    box-shadow:0 1px 2px rgba(15,23,42,.05);
+  }
+  .card-title { display:flex; align-items:center; gap:10px; font-size:17px; font-weight:700; margin:0 0 12px; flex-wrap:wrap; }
+  .badge { font-size:12px; font-weight:600; color:#4f46e5; background:#eef2ff; padding:3px 10px; border-radius:999px; }
+
+  /* ① CSS 禁止选中:文章区域(油猴脚本负责解锁这一层) */
+  .protected, .protected * { -webkit-user-select:none; user-select:none; }
+  .protected p { font-size:15px; line-height:1.95; margin:10px 0; color:#1e293b; }
+  .hint { font-size:13px; color:#64748b; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; padding:10px 14px; margin-top:14px; line-height:1.8; }
+
+  .layers { list-style:none; margin:0; padding:0; }
+  .layers li { display:flex; gap:12px; padding:11px 0; border-bottom:1px dashed #e8edf3; font-size:14px; align-items:baseline; }
+  .layers li:last-child { border-bottom:none; }
+  .layers b { flex:0 0 150px; }
+  .layers span { color:#64748b; line-height:1.7; }
+
+  .log { list-style:none; margin:0; padding:0; max-height:230px; overflow:auto; }
+  .log li { font-size:13.5px; background:#f8fafc; border-radius:8px; padding:8px 12px; margin-bottom:6px; animation:fade .25s ease; }
+  .log li .t { color:#94a3b8; margin-right:10px; font-variant-numeric:tabular-nums; }
+  .log li.empty { color:#94a3b8; background:transparent; border:1px dashed #e2e8f0; }
+  @keyframes fade { from { opacity:0; transform:translateY(-4px); } }
+
+  .steps { margin:0; padding-left:22px; }
+  .steps li { font-size:14.5px; line-height:1.9; margin:8px 0; }
+  .steps code { background:#f1f5f9; border-radius:6px; padding:2px 7px; font-size:13px; }
+  .steps a { color:#4f46e5; }
+  .ok { color:#15803d; }
+  .tip { margin:14px 0 0; font-size:13px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:10px 14px; line-height:1.8; }
+
+  footer { text-align:center; color:#94a3b8; font-size:12.5px; margin-top:32px; }
+
+  textarea#pasteBox {
+    width:100%; min-height:88px; padding:12px 14px;
+    border:1px solid #cbd5e1; border-radius:10px;
+    font-size:15px; font-family:inherit; line-height:1.7;
+    resize:vertical; color:#0f172a; background:#fff;
+  }
+  textarea#pasteBox:focus { outline:2px solid #c7d2fe; border-color:#818cf8; }
+
+  @media (max-width:560px){
+    h1{font-size:22px}
+    .layers b{flex-basis:auto}
+    .layers li{flex-direction:column; gap:2px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🔒 禁止复制演示网站</h1>
+    <p class="sub">本页启用了 <b>6 层「禁止复制 / 禁止粘贴」保护</b> —— 而一段小小的油猴(Tampermonkey / 篡改猴)脚本就能把它们全部解开。亲自动手试试 👇</p>
+    <div id="status" class="status locked">⏳ 正在检测解锁脚本……</div>
+  </header>
+
+  <section class="card protected" id="article">
+    <h2 class="card-title">📄 受保护的文章 <span class="badge">复制我试试</span></h2>
+    <p>欢迎来到「禁止复制演示网站」。和很多文档站、小说站、题库网站一样,这里的文字「看得见、摸不着」:你可以随便读,却很难复制走。</p>
+    <p>本页一共用了 6 层常见保护:CSS 禁止选中、禁用右键菜单、拦截复制/剪切、掐断「选择开始」事件、屏蔽 Ctrl/⌘ + C 等快捷键、输入框禁止粘贴。你的每一次尝试,都会被下方「实时拦截日志」记录下来。</p>
+    <p>但网页终究要把文字交给浏览器显示,所以只要几十行油猴脚本,就能把这些限制全部解开。装好脚本、刷新本页,看到顶部横幅变绿,「复制自由」就回来了。</p>
+    <div class="hint">💡 小实验:① 拖选这篇文章 —— 连选都选不中(被 ① CSS 拦住);② 再去拖选下面「6 层保护」的说明文字 —— 能开始选,但立刻被 ④ 掐断(看日志);③ 在页面任意处点右键、按 ⌘/Ctrl + C,也都会留下记录;④ 在下面的输入框里粘贴 —— 会弹「只能录入不能粘贴」。</div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title">📝 受保护的输入框 <span class="badge">粘贴我试试</span></h2>
+    <textarea id="pasteBox" placeholder="在这里试试粘贴(Ctrl/⌘ + V)—— 和很多录入系统一样:能打字,不让粘贴"></textarea>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title">🧱 本页启用的 6 层保护</h2>
+    <ol class="layers">
+      <li><b>① CSS 禁止选中</b><span>user-select: none —— 鼠标根本选不中文章文字</span></li>
+      <li><b>② 禁用右键菜单</b><span>拦截 contextmenu —— 右键菜单弹不出来</span></li>
+      <li><b>③ 拦截复制 / 剪切</b><span>拦截 copy / cut —— 兜底拦截:即使经浏览器菜单产生了选区再复制,剪贴板也拿不到内容</span></li>
+      <li><b>④ 拦截选择开始</b><span>拦截 selectstart —— 刚想选择就被掐断</span></li>
+      <li><b>⑤ 拦截快捷键</b><span>Ctrl/⌘ + C、X、A、S 全部失效</span></li>
+      <li><b>⑥ 拦截粘贴</b><span>拦截 paste —— 上面的输入框不让粘贴,只能手动打字(很多 OA / 录入系统就是这样)</span></li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title">📋 实时拦截日志</h2>
+    <ul id="log" class="log"><li class="empty">还没有拦截记录 —— 试着拖选文字、点右键、或按 ⌘/Ctrl + C</li></ul>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title">🗝️ 怎么解锁?(装一个油猴脚本)</h2>
+    <ol class="steps">
+      <li>浏览器里装好 <b>篡改猴 Tampermonkey</b> 扩展(Chrome / Edge 商店均可安装)。</li>
+      <li>点这个链接:<a href="enable-copy.user.js">安装「解锁复制」脚本</a> —— 篡改猴会自动弹出安装页,点「安装」即可。</li>
+      <li>回到本页<b>刷新</b> —— 顶部横幅变成<b class="ok">绿色「已解锁」</b>,就成功了 🎉</li>
+    </ol>
+    <div class="tip">🔧 备用方法:点浏览器右上角篡改猴图标 → 「添加新脚本」→ 全选删掉模板 → 粘贴 <code>enable-copy.user.js</code> 的完整内容 → 保存(⌘/Ctrl + S)。<br>📂 直接双击 HTML 文件用 file:// 打开也可以,但要在篡改猴的扩展详情里打开「允许访问文件网址」开关。<br>⚠️ 上面的安装链接打不开?先在本目录运行 <code>python3 -m http.server 8765</code> 启动演示服务器,或改用「粘贴安装」。装好后,可在篡改猴菜单里随时开关「解锁复制」(按网站分别记忆)。</div>
+  </section>
+
+  <footer>仅供学习演示 · 页面与解锁脚本均为本地文件,不上传任何数据</footer>
+</div>
+
+<script>
+(function () {
+  var logEl = document.getElementById('log');
+  var statusEl = document.getElementById('status');
+
+  function now() { return new Date().toLocaleTimeString('zh-CN', { hour12: false }); }
+
+  function addLog(text) {
+    var empty = logEl.querySelector('.empty');
+    if (empty) empty.remove();
+    var li = document.createElement('li');
+    var t = document.createElement('span');
+    t.className = 't';
+    t.textContent = now();
+    li.appendChild(t);
+    li.appendChild(document.createTextNode(text));
+    logEl.insertBefore(li, logEl.firstChild);
+    while (logEl.children.length > 9) logEl.removeChild(logEl.lastChild);
+  }
+
+  /* —— ② 禁用右键菜单 —— */
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    addLog('🚫 拦截了「右键菜单」');
+  });
+
+  /* —— ③ 拦截复制 / 剪切(兜底层)—— */
+  document.addEventListener('copy', function (e) {
+    e.preventDefault();
+    addLog(window.__copyUnlockActive
+      ? '🚫 页面试图拦截「复制」—— 解锁脚本已把内容补写进剪贴板 ✅'
+      : '🚫 拦截了「复制」');
+  });
+  document.addEventListener('cut', function (e) {
+    e.preventDefault();
+    addLog(window.__copyUnlockActive
+      ? '🚫 页面试图拦截「剪切」—— 解锁脚本已把内容补写进剪贴板 ✅'
+      : '🚫 拦截了「剪切」');
+  });
+
+  function isEditableTarget(node) {
+    if (!node || !node.tagName) return false;
+    var tag = node.tagName.toLowerCase();
+    if (tag === 'textarea') return true;
+    if (tag === 'input') {
+      return ['text', 'search', 'url', 'tel', 'password', 'email', 'number', ''].indexOf((node.type || 'text').toLowerCase()) !== -1;
+    }
+    return !!node.isContentEditable;
+  }
+
+  /* —— ④ 拦截选择开始(输入框里不拦,不然光标都放不进去)—— */
+  var lastSelLog = 0;
+  document.addEventListener('selectstart', function (e) {
+    if (isEditableTarget(e.target)) return;
+    e.preventDefault();
+    var t = Date.now();
+    if (t - lastSelLog > 1500) { addLog('🚫 拦截了「选择开始」(selectstart)'); lastSelLog = t; }
+  });
+
+  /* —— ⑤ 拦截快捷键 Ctrl/⌘ + C / X / A / S(输入框里不拦)—— */
+  document.addEventListener('keydown', function (e) {
+    if (isEditableTarget(e.target)) return;
+    var k = (e.key || '').toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'a', 's'].indexOf(k) !== -1) {
+      e.preventDefault();
+      addLog('🚫 拦截了快捷键 ' + (e.metaKey ? '⌘' : 'Ctrl') + ' + ' + k.toUpperCase());
+    }
+  });
+
+  /* —— ⑥ 拦截粘贴 —— */
+  document.getElementById('pasteBox').addEventListener('paste', function (e) {
+    e.preventDefault();
+    addLog(window.__copyUnlockActive
+      ? '🚫 页面试图拦截「粘贴」—— 解锁脚本已把剪贴板内容手动录入 ✅'
+      : '🚫 拦截了「粘贴」(Ctrl/⌘ + V)');
+  });
+
+  /* —— 顶部横幅:检测油猴脚本是否生效 —— */
+  function refresh() {
+    var flagged = false;
+    try { flagged = !!window.__copyUnlockActive; } catch (err) {}
+    var selectable = false;
+    try {
+      var us = getComputedStyle(document.getElementById('article')).userSelect;
+      selectable = (us === 'text' || us === 'auto');
+    } catch (err) {}
+    if (flagged || selectable) {
+      statusEl.className = 'status unlocked';
+      statusEl.textContent = '✅ 已解锁 —— 解锁脚本已生效,可以自由选中、右键、复制了!(若复制仍被拦,刷新本页再试)';
+    } else {
+      statusEl.className = 'status locked';
+      statusEl.textContent = '⛔ 未检测到解锁脚本 —— 本页处于「禁止复制」状态';
+    }
+  }
+  setInterval(refresh, 800);
+  window.addEventListener('copy-unlock-change', refresh);
+  refresh();
+})();
+</script>
+</body>
+</html>
